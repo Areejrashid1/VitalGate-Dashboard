@@ -181,3 +181,5 @@ New server APIs: `/api/me`, `/api/state` (ETag), `/api/model`, `/api/model/verif
   escalate, get explained and expire.
 * **Backend offline**: stop the console; open pages keep the last data, show "Server offline" and reconnect
   automatically.
+
+  Author : Areej Rashid
