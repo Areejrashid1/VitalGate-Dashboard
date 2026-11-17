@@ -12,31 +12,75 @@ No metric, event or prediction is simulated by the console.
 
 ## Run it
 
-Requirements: Windows, Python 3.10+ on PATH. Docker Desktop for live mode. Nothing to install with pip or npm:
+Requirements: Windows, Python 3.10+ on PATH, Docker Desktop for live mode. Nothing to install with pip or npm:
 the server is pure Python standard library and the frontend is plain HTML, CSS and JavaScript modules.
 
-| What | How |
+### Replay mode (recorded traffic, no Docker)
+
+```powershell
+cd "C:\Users\rashi\Desktop\VitalGate PWA"
+.\start.cmd
+```
+
+Or double-click `start.cmd`.
+
+### Live mode (Docker test bed + real gateway)
+
+1. Open **Docker Desktop** and wait until it shows "Engine running".
+2. Run:
+
+```powershell
+cd "C:\Users\rashi\Desktop\VitalGate PWA"
+.\start.cmd live
+```
+
+The launcher starts the test-bed containers itself (`docker compose up -d --build`), then the console, then
+`soc/live.py`. The first start can take a few minutes. The browser opens <http://localhost:8090>; sign in and
+check that the header pill says **LIVE**.
+
+### Stop, status, logs
+
+| What | Command |
 |---|---|
-| Start (replay of recorded traffic) | double-click `start.cmd` |
-| Start (live: Docker test bed + gateway) | `start.cmd live` |
-| Stop everything | double-click `stop.cmd` |
-| Status / logs | `.\vitalgate.ps1 status` · `.\vitalgate.ps1 logs` |
-| Open | <http://localhost:8090> |
+| Stop everything (console, pipeline, and the test bed if the launcher started it) | `.\stop.cmd` |
+| What is running | `.\vitalgate.ps1 status` |
+| Last lines of every log | `.\vitalgate.ps1 logs` |
+| Open the console | <http://localhost:8090> |
 
 The launcher stops the old dashboard (`soc/server.py`) if it is still running on port 8090, starts this console,
 then starts the product's own pipeline (`soc/replay.py` or `soc/live.py`) unchanged.
 
-Manual start (two terminals):
+### Manual start (without the launcher)
 
 ```powershell
+# 1. Test bed (live mode only)
+cd "C:\Users\rashi\Desktop\VitalGate Project Code\product\testbed"
+docker compose up -d --build
+
+# 2. Pipeline (second window)
+cd "C:\Users\rashi\Desktop\VitalGate Project Code\product"
+python soc\live.py                  # live
+python soc\replay.py --speed 30     # or replay
+
+# 3. Console (third window)
 cd "C:\Users\rashi\Desktop\VitalGate PWA"
-python server.py                     # console on http://localhost:8090
-cd "..\VitalGate Project Code\product"
-python soc\replay.py --speed 30      # or: python soc\live.py  (test bed running)
+python server.py
 ```
+
+Stop with Ctrl + C in windows 2 and 3, then `docker compose down` in the testbed folder.
 
 The product folder is set in `config.json` (default `../VitalGate Project Code/product`), or with
 `python server.py --product <path>`.
+
+### Is it really live?
+
+* Header pill: **LIVE** (not REPLAY). "LIVE · paused" means Docker or `live.py` is not running.
+* Dashboard → System health: the network sensor's packet count keeps rising; the gateway (PEP) says "enforcing".
+* Network Monitoring: dots move on the traffic map.
+* Run an attack from the test bed: an incident opens within seconds with its explanation and gateway actions.
+
+The detection model runs inside `live.py` (frozen federated bundle in `product/bundle`); the console displays its
+scores, classes, confidence and SHAP explanations and never runs a second copy of the model.
 
 ## Accounts
 
@@ -71,7 +115,7 @@ python server.py --add-user NAME     # create an account or reset a password ("f
 | Zero-Trust Response | L0–L4 ladder, criticality caps (PACS ≤ L2, modalities ≤ L3), policy, current enforcement with fail-open expiry, full action history |
 | Quarantine Management | held, released and blocked uploads, preamble check, release history per record |
 | Federated Learning | 3 hospitals, 48 accepted updates over 16 rounds, equal 1/n scaling, k-of-n gate, bundles, SHA-256 verification; research results kept separate |
-| Analytics & Reports | trends, per-device history, verdicts (false-positive view), response and confidence distributions, timing, quarantine activity, CSV / JSON / print-to-PDF; research performance section (macro-F1 computed from `eval/results/*/windows.csv`) |
+| Analytics & Reports | trends, per-device history, verdicts (false-positive view), response and confidence distributions, timing, quarantine activity, CSV / JSON / print-to-PDF; research performance section (macro-F1 computed from `eval/results/*/windows.csv`: 0.630 zero-shot, 0.879 site-adapted on the new hospital) |
 | System Logs | event feed, PEP log, quarantine log and process logs merged; search, filter, levels, auto-refresh, expandable details, export |
 | Settings | profile, password change, theme, notifications, refresh rate, system and model status |
 | How VitalGate Works | animated 10-step architecture walkthrough |
@@ -129,13 +173,11 @@ New server APIs: `/api/me`, `/api/state` (ETag), `/api/model`, `/api/model/verif
 
 ## Testing replay and live mode
 
-* **Replay**: `start.cmd`. The header pill shows **REPLAY**, the gateway shows "simulated", and incidents appear as
+* **Replay**: `.\start.cmd`. The header pill shows **REPLAY**, the gateway shows "simulated", and incidents appear as
   the recorded campaigns play (30× speed). Quarantine pages show records from earlier live runs only.
-* **Live**: start Docker Desktop, then `start.cmd live`. The pill shows **LIVE**, System health shows the gateway
+* **Live**: start Docker Desktop, then `.\start.cmd live`. The pill shows **LIVE**, System health shows the gateway
   "enforcing", the Zero-Trust page shows kernel set entries with their remaining time, and quarantined uploads
   appear on the Quarantine page. Run an attack from the test bed's orchestrator to watch an incident open,
   escalate, get explained and expire.
 * **Backend offline**: stop the console; open pages keep the last data, show "Server offline" and reconnect
   automatically.
-#   V i t a l G a t e - D a s h b o a r d  
- 
