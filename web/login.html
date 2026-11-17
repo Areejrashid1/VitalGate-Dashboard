@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#F5F8FC">
+<title>Sign in · VitalGate</title>
+<link rel="icon" href="/static/img/logo.svg" type="image/svg+xml">
+<link rel="manifest" href="/manifest.webmanifest">
+<script src="/static/js/theme-init.js"></script>
+<link rel="stylesheet" href="/static/css/tokens.css">
+<link rel="stylesheet" href="/static/css/base.css">
+<link rel="stylesheet" href="/static/css/components.css">
+<link rel="stylesheet" href="/static/css/auth.css">
+</head>
+<body class="auth" data-page="login">
+<aside class="auth-brand" data-brand></aside>
+<main class="auth-side">
+  <button class="theme-fab" data-theme-fab aria-label="Toggle dark mode"></button>
+  <div class="auth-card">
+    <div class="mbrand" data-mbrand></div>
+    <h2>Welcome back</h2>
+    <p class="lead">Sign in to the VitalGate security operations console.</p>
+    <div class="alert" data-alert role="alert"></div>
+    <form data-form novalidate>
+      <div class="af">
+        <label for="u">Username</label>
+        <div class="wrap"><span data-ic="user"></span><input id="u" name="username" autocomplete="username" autocapitalize="off" spellcheck="false" required maxlength="40" placeholder="e.g. areej"></div>
+        <div class="err" data-err="username"></div>
+      </div>
+      <div class="af">
+        <label for="p">Password <span class="caps" data-caps><span data-ic="alert"></span>Caps Lock is on</span></label>
+        <div class="wrap"><span data-ic="lock"></span><input id="p" name="password" type="password" autocomplete="current-password" required maxlength="200" placeholder="Your password">
+          <button type="button" class="eye" data-eye aria-label="Show password"></button></div>
+        <div class="err" data-err="password"></div>
+      </div>
+      <div class="auth-row">
+        <label class="check"><input type="checkbox" name="remember" data-remember> Remember me for 7 days</label>
+        <a href="/forgot">Forgot password?</a>
+      </div>
+      <button class="auth-btn" type="submit" data-submit><span class="spin"></span><span data-ic="arrowRight"></span><span data-label>Sign in</span></button>
+    </form>
+    <div class="auth-alt">New analyst? <a href="/signup">Request an account</a></div>
+    <div class="auth-meta"><span class="srv" data-srv><span class="dot mute"></span>Checking server…</span><span>Session cookie · HttpOnly · SameSite</span></div>
+  </div>
+</main>
+<script type="module" src="/static/js/auth.js"></script>
+</body>
+</html>

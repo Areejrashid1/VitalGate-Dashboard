@@ -1,0 +1,70 @@
+/* VitalGate design tokens. Light is the default; [data-theme="dark"] on <html> switches every component. */
+:root {
+  --blue: #1769E0;
+  --blue-deep: #123B70;
+  --blue-2: #3B82F6;
+  --blue-soft: #EAF3FF;
+  --bg: #F5F8FC;
+  --card: #FFFFFF;
+  --card-2: #F8FAFD;
+  --text: #172B4D;
+  --text-2: #64748B;
+  --text-3: #94A3B8;
+  --border: #E2EAF3;
+  --border-2: #D3DEEB;
+  --ok: #16A36A;
+  --warn: #F59E0B;
+  --orange: #EA7317;
+  --crit: #DC3545;
+  --ok-soft: #E7F6EF;
+  --warn-soft: #FEF5E2;
+  --orange-soft: #FDEEE1;
+  --crit-soft: #FCEBED;
+  --info-soft: #EAF3FF;
+  --grid: #EDF2F8;
+  --shadow-sm: 0 1px 2px rgba(18, 59, 112, .06);
+  --shadow: 0 1px 2px rgba(18, 59, 112, .05), 0 4px 16px rgba(18, 59, 112, .06);
+  --shadow-lg: 0 12px 40px rgba(18, 59, 112, .16);
+  --side: #FFFFFF;
+  --side-text: #3B4F6E;
+  --side-active: #EAF3FF;
+  --overlay: rgba(15, 30, 55, .42);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --font: "Inter", "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: "JetBrains Mono", "Cascadia Code", Consolas, "SFMono-Regular", Menlo, monospace;
+  --l0: #16A36A; --l1: #3B82F6; --l2: #F59E0B; --l3: #EA7317; --l4: #DC3545;
+  --c1: #1769E0; --c2: #22A6B3; --c3: #7C5CDB; --c4: #F59E0B; --c5: #DC3545; --c6: #16A36A; --c7: #EA7317; --c8: #64748B;
+  --dev-body: #FFFFFF; --dev-shade: #D9E4F2; --dev-accent: #1769E0; --dev-dark: #2B3F5E; --dev-screen: #0F2747; --dev-bore: #EEF3FA; --dev-floor: rgba(18, 59, 112, .10);
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --blue: #4C8DF6;
+  --blue-deep: #0B1B33;
+  --blue-2: #60A5FA;
+  --blue-soft: #15305A;
+  --bg: #0A1628;
+  --card: #102240;
+  --card-2: #0D1D37;
+  --text: #E8F0FB;
+  --text-2: #9DB0CB;
+  --text-3: #6F84A3;
+  --border: #1E355A;
+  --border-2: #29446E;
+  --ok-soft: #0F3A31;
+  --warn-soft: #3D3016;
+  --orange-soft: #40281A;
+  --crit-soft: #42202A;
+  --info-soft: #15305A;
+  --grid: #1A2F50;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .3);
+  --shadow: 0 1px 2px rgba(0, 0, 0, .25), 0 6px 20px rgba(0, 0, 0, .25);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, .5);
+  --side: #0C1C35;
+  --side-text: #B6C6DD;
+  --side-active: #15305A;
+  --overlay: rgba(2, 8, 20, .62);
+  --dev-body: #1D3459; --dev-shade: #2C4A78; --dev-accent: #60A5FA; --dev-dark: #0B1830; --dev-screen: #06101F; --dev-bore: #0E1E38; --dev-floor: rgba(0, 0, 0, .35);
+  color-scheme: dark;
+}

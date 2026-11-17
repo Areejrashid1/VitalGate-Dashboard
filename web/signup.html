@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#F5F8FC">
+<title>Request an account · VitalGate</title>
+<link rel="icon" href="/static/img/logo.svg" type="image/svg+xml">
+<script src="/static/js/theme-init.js"></script>
+<link rel="stylesheet" href="/static/css/tokens.css">
+<link rel="stylesheet" href="/static/css/base.css">
+<link rel="stylesheet" href="/static/css/components.css">
+<link rel="stylesheet" href="/static/css/auth.css">
+</head>
+<body class="auth" data-page="signup">
+<aside class="auth-brand" data-brand></aside>
+<main class="auth-side">
+  <button class="theme-fab" data-theme-fab aria-label="Toggle dark mode"></button>
+  <div class="auth-card" style="max-width:460px">
+    <div class="mbrand" data-mbrand></div>
+    <h2>Request an account</h2>
+    <p class="lead">VitalGate accounts are approved by an administrator on the VitalGate host before they can sign in.</p>
+    <div class="alert" data-alert role="alert"></div>
+    <form data-form novalidate>
+      <div class="af"><label for="fn">Full name</label>
+        <div class="wrap"><span data-ic="user"></span><input id="fn" name="fullname" autocomplete="name" required maxlength="80" placeholder="First and last name"></div><div class="err" data-err="fullname"></div></div>
+      <div class="af"><label for="em">Email address</label>
+        <div class="wrap"><span data-ic="mail"></span><input id="em" name="email" type="email" autocomplete="email" required maxlength="200" placeholder="name@hospital.org"></div><div class="err" data-err="email"></div></div>
+      <div class="af"><label for="u">Username</label>
+        <div class="wrap"><span data-ic="hash"></span><input id="u" name="username" autocomplete="username" autocapitalize="off" spellcheck="false" required maxlength="40" placeholder="letters, digits . _ @ -"></div><div class="err" data-err="username"></div></div>
+      <div class="af"><label for="p">Password <span class="caps" data-caps><span data-ic="alert"></span>Caps Lock is on</span></label>
+        <div class="wrap"><span data-ic="lock"></span><input id="p" name="password" type="password" autocomplete="new-password" required maxlength="200" placeholder="At least 10 characters">
+          <button type="button" class="eye" data-eye aria-label="Show password"></button></div>
+        <div class="meter" data-meter><i></i><i></i><i></i><i></i></div><div class="meter-txt" data-meter-txt>Password strength</div>
+        <div class="rules" data-rules><span data-r="len">10+ characters</span><span data-r="let">a letter</span><span data-r="dig">a digit</span><span data-r="user">not your username</span></div>
+        <div class="err" data-err="password"></div></div>
+      <div class="af"><label for="p2">Confirm password</label>
+        <div class="wrap"><span data-ic="lock"></span><input id="p2" name="confirm" type="password" autocomplete="new-password" required maxlength="200" placeholder="Repeat the password">
+          <button type="button" class="eye" data-eye2 aria-label="Show password"></button></div><div class="err" data-err="confirm"></div></div>
+      <div class="af"><label class="check" style="font-weight:500;color:var(--text-2)"><input type="checkbox" name="terms" data-terms> I will use VitalGate only for authorised security monitoring and will not share access, patient data or enforcement controls.</label><div class="err" data-err="terms"></div></div>
+      <button class="auth-btn" type="submit" data-submit><span class="spin"></span><span data-ic="userPlus"></span><span data-label>Create account request</span></button>
+    </form>
+    <div class="auth-alt">Already have an account? <a href="/login">Sign in</a></div>
+  </div>
+</main>
+<script type="module" src="/static/js/auth.js"></script>
+</body>
+</html>

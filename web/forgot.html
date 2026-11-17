@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#F5F8FC">
+<title>Password help · VitalGate</title>
+<link rel="icon" href="/static/img/logo.svg" type="image/svg+xml">
+<script src="/static/js/theme-init.js"></script>
+<link rel="stylesheet" href="/static/css/tokens.css">
+<link rel="stylesheet" href="/static/css/base.css">
+<link rel="stylesheet" href="/static/css/components.css">
+<link rel="stylesheet" href="/static/css/auth.css">
+</head>
+<body class="auth" data-page="forgot">
+<aside class="auth-brand" data-brand></aside>
+<main class="auth-side">
+  <button class="theme-fab" data-theme-fab aria-label="Toggle dark mode"></button>
+  <div class="auth-card">
+    <div class="mbrand" data-mbrand></div>
+    <h2>Forgot your password?</h2>
+    <p class="lead">VitalGate runs on a hospital network with no outgoing email, so passwords are reset by an administrator on the VitalGate host. Nothing is sent over the internet.</p>
+    <ol class="steps">
+      <li><b>Contact your VitalGate administrator</b> (the person who runs the console on the security workstation) and tell them your username.</li>
+      <li><b>The administrator sets a temporary password</b> from the VitalGate folder:
+        <div class="cmd">python server.py --add-user &lt;your username&gt;</div></li>
+      <li><b>Sign in and change it</b> under Settings → Account → Change password. Other sessions are signed out automatically.</li>
+    </ol>
+    <a class="auth-btn" href="/login" style="text-decoration:none;margin-top:8px"><span data-ic="arrowRight"></span>Back to sign in</a>
+    <div class="auth-alt">No account yet? <a href="/signup">Request one</a></div>
+  </div>
+</main>
+<script type="module" src="/static/js/auth.js"></script>
+</body>
+</html>
