@@ -10,68 +10,6 @@ The console does **not** contain its own detector. It runs on top of the existin
 model, TreeSHAP explanations, CUSUM alarms, the L0–L4 response ladder, the gateway (PEP) and the quarantine store.
 No metric, event or prediction is simulated by the console.
 
-## Run it
-
-Requirements: Windows, Python 3.10+ on PATH, Docker Desktop for live mode. Nothing to install with pip or npm:
-the server is pure Python standard library and the frontend is plain HTML, CSS and JavaScript modules.
-
-### Replay mode (recorded traffic, no Docker)
-
-```powershell
-cd "C:\Users\rashi\Desktop\VitalGate PWA"
-.\start.cmd
-```
-
-Or double-click `start.cmd`.
-
-### Live mode (Docker test bed + real gateway)
-
-1. Open **Docker Desktop** and wait until it shows "Engine running".
-2. Run:
-
-```powershell
-cd "C:\Users\rashi\Desktop\VitalGate PWA"
-.\start.cmd live
-```
-
-The launcher starts the test-bed containers itself (`docker compose up -d --build`), then the console, then
-`soc/live.py`. The first start can take a few minutes. The browser opens <http://localhost:8090>; sign in and
-check that the header pill says **LIVE**.
-
-### Stop, status, logs
-
-| What | Command |
-|---|---|
-| Stop everything (console, pipeline, and the test bed if the launcher started it) | `.\stop.cmd` |
-| What is running | `.\vitalgate.ps1 status` |
-| Last lines of every log | `.\vitalgate.ps1 logs` |
-| Open the console | <http://localhost:8090> |
-
-The launcher stops the old dashboard (`soc/server.py`) if it is still running on port 8090, starts this console,
-then starts the product's own pipeline (`soc/replay.py` or `soc/live.py`) unchanged.
-
-### Manual start (without the launcher)
-
-```powershell
-# 1. Test bed (live mode only)
-cd "C:\Users\rashi\Desktop\VitalGate Project Code\product\testbed"
-docker compose up -d --build
-
-# 2. Pipeline (second window)
-cd "C:\Users\rashi\Desktop\VitalGate Project Code\product"
-python soc\live.py                  # live
-python soc\replay.py --speed 30     # or replay
-
-# 3. Console (third window)
-cd "C:\Users\rashi\Desktop\VitalGate PWA"
-python server.py
-```
-
-Stop with Ctrl + C in windows 2 and 3, then `docker compose down` in the testbed folder.
-
-The product folder is set in `config.json` (default `../VitalGate Project Code/product`), or with
-`python server.py --product <path>`.
-
 ### Is it really live?
 
 * Header pill: **LIVE** (not REPLAY). "LIVE · paused" means Docker or `live.py` is not running.
@@ -181,3 +119,7 @@ New server APIs: `/api/me`, `/api/state` (ETag), `/api/model`, `/api/model/verif
   escalate, get explained and expire.
 * **Backend offline**: stop the console; open pages keep the last data, show "Server offline" and reconnect
   automatically.
+
+
+
+**Author : Areej Rashid**
