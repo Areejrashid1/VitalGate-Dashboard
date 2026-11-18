@@ -34,7 +34,7 @@ export default {
       </div>
       <div class="grid g2 mt16">
         ${card({ title: "Model information", icon: "cpu", body: `<div data-model><div class="skel" style="height:120px"></div></div>` })}
-        ${card({ title: "Application information", icon: "info", body: `<dl class="kv"><dt>Application</dt><dd>VitalGate SOC console (multi-page web app, installable PWA)</dd><dt>Tagline</dt><dd>Intelligent Security for Medical Imaging Infrastructure</dd><dt>Backend</dt><dd>server.py (Python standard library) reading the VitalGate product: ${esc(me.product || "product")}</dd>
+        ${"" && card({ title: "Application information", icon: "info", body: `<dl class="kv"><dt>Application</dt><dd>VitalGate SOC console (multi-page web app, installable PWA)</dd><dt>Tagline</dt><dd>Intelligent Security for Medical Imaging Infrastructure</dd><dt>Backend</dt><dd>server.py (Python standard library) reading the VitalGate product: ${esc(me.product || "product")}</dd>
           <dt>Data sources</dt><dd class="small">soc/data/incidents.json · feedback.json · testbed/out/pep/* · bundle*/ · eval/results/*</dd><dt>Changes from here</dt><dd class="small">analyst triage (feedback.json), your profile and password. Model, policy and gateway are read-only.</dd></dl>` })}
       </div>`;
     const $ = (s) => el.querySelector(s);

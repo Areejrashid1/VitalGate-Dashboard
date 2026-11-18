@@ -33,7 +33,7 @@ export default {
         ${card({ title: "Response timing", icon: "clock", sub: "From the incident records and analyst log", body: `<div data-lat></div>` })}
         ${card({ title: "Quarantine activity", icon: "archive", sub: "Uploads handled by the quarantine store (live runs)", body: `<div data-q></div>` })}
       </div>
-      <div class="research-sec mt16"><div class="row between wrap mb12"><div><h2>${icon("file")} Research performance</h2><div class="small muted">Measured offline by <span class="mono">eval/offline_eval.py</span> on recorded test-bed campaigns. These are previously measured results, not live measurements.</div></div>${research("Previously measured")}</div><div data-res><div class="skel" style="height:200px"></div></div></div>`;
+      <div class="research-sec mt16"><div class="row between wrap mb12"><h2>${icon("file")} Research performance</h2>${research("Previously measured")}</div><div data-res><div class="skel" style="height:200px"></div></div></div>`;
     const $ = (s) => el.querySelector(s);
     bindSeg(el, "rng", (v) => { range = v; draw(ctx.store.get()); });
     api.research().then((r) => { res = r; draw(ctx.store.get()); }).catch((e) => { $("[data-res]").innerHTML = `<div class="small muted">Could not load research results: ${esc(e.message)}</div>`; });
@@ -72,7 +72,7 @@ export default {
       const vt = { confirmed: 0, false: 0, ack: 0, new: 0 }; incs.forEach((i) => vt[D.triage(s, i).key]++);
       donut($("[data-fp]"), [{ label: "Confirmed attack", value: vt.confirmed, color: "var(--crit)" }, { label: "False alarm", value: vt.false, color: "var(--ok)" }, { label: "Acknowledged", value: vt.ack, color: "var(--blue)" }, { label: "Untriaged", value: vt.new, color: "var(--border-2)" }], { size: 160, center: { value: vt.confirmed + vt.false ? pct(vt.false / (vt.confirmed + vt.false)) : "—", label: "false-alarm rate" } });
       const gt = incs.filter((i) => (i.truth || []).length), gtFalse = gt.filter((i) => i.truth.every((x) => x === "benign")).length;
-      $("[data-fpl]").innerHTML = `<div class="small muted">${vt.confirmed + vt.false} of ${incs.length} incidents have a verdict.</div>${gt.length ? `<div class="small mt8">Test-bed ground truth: <b>${gtFalse}</b> of ${gt.length} incidents overlapped only benign traffic <span class="faint">(attack orchestrator log, evaluation only)</span>.</div>` : ""}`;
+      $("[data-fpl]").innerHTML = `<div class="small muted">${vt.confirmed + vt.false} of ${incs.length} incidents have a verdict.</div>`;
       columns($("[data-resp]"), D.LEVELS.slice(1).map((L) => ({ label: `L${L.n}`, sub: L.name, value: incs.filter((i) => i.max_level === L.n).length, color: L.color })), { height: 190 });
       const cf = incs.map(D.confidence).filter((x) => x != null), bins = [[.5, .6], [.6, .7], [.7, .8], [.8, .9], [.9, 1.01]];
       columns($("[data-conf]"), bins.map(([lo, hi]) => ({ label: `${Math.round(lo * 100)}–${Math.min(100, Math.round(hi * 100))}%`, value: cf.filter((x) => x >= lo && x < hi).length + (lo === .5 ? cf.filter((x) => x < .5).length : 0), color: "var(--blue)" })), { height: 190 });
@@ -92,16 +92,15 @@ export default {
     }
     function drawResearch() {
       const R = res.runs || [], F = (res.federated || {}).results_notebook03 || {};
-      const pick = ["tb3_frozen", "tb3_onboard", "tb3_local_onboard", "ALL_frozen", "benign_baseline"].map((n) => R.find((r) => r.name === n)).filter(Boolean);
+      const pick = ["tb3_frozen", "tb3_local_onboard", "ALL_frozen", "benign_baseline"].map((n) => R.find((r) => r.name === n)).filter(Boolean);
       $("[data-res]").innerHTML = `<div class="grid g4" style="gap:12px">
-          <div class="stat-mini"><span>Lab macro-F1 (federated, 3 hospitals)</span><b class="big-num">${esc(F.P1_3_sites_macroF1 ?? "—")}</b><span class="tiny">notebook 03</span></div>
-          ${["tb3_frozen", "tb3_local_onboard"].map((n) => { const r = R.find((x) => x.name === n); return `<div class="stat-mini"><span>${esc(RUN_LABEL[n])} · macro-F1</span><b class="big-num">${r && r.window_metrics ? r.window_metrics.macro_f1 : "—"}</b><span class="tiny">${r && r.window_metrics ? `${num(r.window_metrics.windows)} windows (computed from windows.csv)` : "windows.csv not found"}</span></div>`; }).join("")}
+          <div class="stat-mini"><span>Lab macro-F1 (federated, 3 hospitals)</span><b class="big-num">${esc(F.P1_3_sites_macroF1 ?? "—")}</b></div>
+          ${["tb3_frozen", "tb3_local_onboard"].map((n) => { const r = R.find((x) => x.name === n); return `<div class="stat-mini"><span>${esc(RUN_LABEL[n])} · macro-F1</span><b class="big-num">${r && r.window_metrics ? r.window_metrics.macro_f1 : "—"}</b></div>`; }).join("")}
           ${(() => { const r = R.find((x) => x.name === "tb3_frozen"); return `<div class="stat-mini"><span>Attacks detected (new hospital)</span><b class="big-num">${r && r.detection ? `${r.detection.detected}/${r.detection.runs}` : "—"}</b><span class="tiny">${r && r.detection ? `median time to detect ${num(r.detection.median_TTD_s, 2)} s` : ""}</span></div>`; })()}
         </div>
-        <div class="table-wrap mt16"><table class="t"><thead><tr><th>Evaluation run</th><th class="num">Macro-F1</th><th class="num">Attack F1</th><th class="num">Detected</th><th class="num">Median TTD</th><th class="num">False episodes / h</th><th class="num">Clinical min blocked / h</th><th>Measured</th></tr></thead><tbody>
-          ${R.map((r) => `<tr><td><b class="small">${esc(RUN_LABEL[r.name] || r.name)}</b><div class="tiny faint mono">${esc(r.name)}</div></td><td class="num">${r.window_metrics ? r.window_metrics.macro_f1 : "—"}</td><td class="num">${r.window_metrics && r.window_metrics.binary_f1 != null ? r.window_metrics.binary_f1 : "—"}</td>
-            <td class="num">${r.detection ? `${r.detection.detected}/${r.detection.runs}` : "—"}</td><td class="num">${r.detection && r.detection.median_TTD_s != null ? `${num(r.detection.median_TTD_s, 2)} s` : "—"}</td><td class="num">${r.detection ? num(r.detection.false_episodes_per_h, 2) : "—"}</td>
-            <td class="num">${r.response && r.response.ladder ? num(r.response.ladder.clinical_min_blocked_per_h, 2) : "—"}</td><td class="small muted">${esc(r.created || "")}</td></tr>`).join("")}</tbody></table></div>
+        <div class="table-wrap mt16"><table class="t"><thead><tr><th>Evaluation run</th><th class="num">Macro-F1</th><th class="num">Detected</th><th class="num">Median TTD</th><th class="num">False alarms / h</th></tr></thead><tbody>
+          ${pick.map((r) => `<tr><td><b class="small">${esc(RUN_LABEL[r.name] || r.name)}</b></td><td class="num">${r.window_metrics ? r.window_metrics.macro_f1 : "—"}</td>
+            <td class="num">${r.detection ? `${r.detection.detected}/${r.detection.runs}` : "—"}</td><td class="num">${r.detection && r.detection.median_TTD_s != null ? `${num(r.detection.median_TTD_s, 2)} s` : "—"}</td><td class="num">${r.detection ? num(r.detection.false_episodes_per_h, 2) : "—"}</td></tr>`).join("")}</tbody></table></div>
         <p class="note mt12">${icon("info")}<span>Macro-F1 is computed by this console from each run's windows.csv (prediction = model class when score ≥ 0.5 or the DPI rule fired, otherwise benign). TTD = time to detect from the true attack start. “New hospital” = test-bed campaign 3, never used for training.</span></p>`;
     }
     return { update: draw };

@@ -69,7 +69,7 @@ function detail(el, id, ctx) {
     $("[data-p]").innerHTML = `<div data-head></div>
       <div class="grid g-21 mt16">
         <div class="col" style="gap:16px">
-          ${card({ title: "Score and response over time", icon: "activity", sub: "Every 2-second window of this incident", body: `<div data-ch></div><div class="legend mt8"><span><i style="background:var(--crit);border-radius:50%"></i>Alarm window</span><span><i style="background:var(--blue-2);border-radius:50%"></i>Score</span><span><i class="line" style="background:var(--orange)"></i>Level (right axis)</span></div>` })}
+          ${card({ title: "Score and response over time", icon: "activity", sub: "Every 2-second window of this incident", body: `<div data-ch></div><div class="legend mt8"><span><i style="background:var(--crit);border-radius:50%"></i>Alarm</span><span><i style="background:var(--blue-2);border-radius:50%"></i>Score</span><span><i class="line" style="background:var(--orange)"></i>Level</span></div>` })}
           ${card({ title: "Investigation timeline", icon: "clock", body: `<div data-tl></div>` })}
           ${card({ title: "Zero-trust actions and gateway commands", icon: "layers", body: `<div data-acts></div>` })}
         </div>

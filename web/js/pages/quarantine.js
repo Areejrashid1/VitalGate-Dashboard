@@ -50,7 +50,7 @@ export default {
     function draw(s) {
       if (!s) return;
       const m = D.mode(s);
-      $("[data-banner]").innerHTML = (err ? banner("crit", `Could not load the quarantine log: ${esc(err)}`) : "") + liveOnly(m, "Quarantine data") + (m !== "live" && data && data.items.length ? banner("info", "The records below are from earlier live runs (the store's log on disk).") : "");
+      $("[data-banner]").innerHTML = (err ? banner("crit", `Could not load the quarantine log: ${esc(err)}`) : "") + liveOnly(m, "Live quarantine");
       if (!data) { $("[data-k]").innerHTML = `<div class="skel" style="height:96px;grid-column:1/-1"></div>`; return; }
       const it = data.items, c = (st) => it.filter((i) => i.status === st).length;
       $("[data-k]").innerHTML = [

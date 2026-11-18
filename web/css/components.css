@@ -200,4 +200,7 @@ table.t { width: 100%; border-collapse: collapse; font-size: 13px; }
 .chips { display: flex; gap: 6px; flex-wrap: wrap; }
 .chip { font-size: 12px; padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); background: var(--card); cursor: pointer; color: var(--text-2); font-weight: 560; }
 .chip.on { background: var(--blue-soft); border-color: color-mix(in srgb, var(--blue) 40%, var(--border)); color: var(--blue); }
-[data-overview] .ic { width: 26px; height: 26px; }
+.ovi .ic { width: 24px; height: 24px; }
+.content .note { display: none; }
+.kpi .kfoot { flex-wrap: nowrap; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+.kpi .kfoot .trend { margin-right: 6px; }

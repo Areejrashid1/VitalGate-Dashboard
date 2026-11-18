@@ -19,7 +19,7 @@ export default {
       ${card({ title: "Current enforcement", icon: "shield", sub: "Devices above L0 right now", cls: "mt16", bodyCls: "flush", body: `<div data-cur></div>` })}
       <div class="grid g-21 mt16">
         ${card({ title: "Response history", icon: "clock", sub: "Every level change decided by the response engine", bodyCls: "flush", actions: `<select class="input sm" data-lf><option value="">All levels</option>${D.LEVELS.map((L) => `<option value="${L.n}">L${L.n} ${L.name}</option>`).join("")}</select>`, body: `<div data-hist></div>` })}
-        ${card({ title: "Analyst controls", icon: "user", sub: "What a person can change, and what they cannot", body: `<div data-ctl></div>` })}
+        ${card({ title: "Analyst controls", icon: "user", body: `<div data-ctl></div>` })}
       </div>`;
     const $ = (s) => el.querySelector(s);
     ctx.store.once("model", api.model).then((m) => { policy = m.policy; draw(ctx.store.get()); }).catch(() => {});
@@ -32,9 +32,9 @@ export default {
       { key: "sev", label: "Severity", get: (r) => r.inc && r.inc.severity, html: (r) => r.inc ? badge(r.inc.severity, D.sevTone(r.inc.severity)) : "" },
       { key: "conf", label: "Confidence", num: true, get: (r) => r.inc && D.confidence(r.inc), html: (r) => esc(r.inc ? pct(D.confidence(r.inc)) : "—") },
       { key: "dur", label: "Since", get: (r) => r.since, html: (r) => esc(r.since != null ? dur(r.now - r.since) : "—") },
-      { key: "exp", label: "Expires (fail-open)", get: (r) => r.left, html: (r) => r.left != null ? `<span class="nowrap">${esc(dur(r.left))}</span><div class="tiny faint">unless renewed by a new alarm</div>` : "—" },
+      { key: "exp", label: "Expires (fail-open)", get: (r) => r.left, html: (r) => r.left != null ? `<span class="nowrap">${esc(dur(r.left))}</span>` : "—" },
       { key: "gw", label: "Gateway", get: (r) => r.gw, html: (r) => r.gw },
-      { key: "how", label: "Decided", sort: false, html: (r) => `${badge("automatic", "mute")}${r.hold ? " " + badge("analyst hold", "crit", "lock") : ""}` },
+      { key: "how", label: "", sort: false, html: (r) => r.hold ? badge("hold", "crit", "lock") : "" },
     ], { pageSize: 10, sortKey: "lvl", empty: "No device is restricted", emptySub: "Every device is at L0 (allow).", emptyIcon: "shieldCheck" });
     const hist = new Table($("[data-hist]"), [
       { key: "t", label: "Time", get: (a) => a.t, html: (a) => esc(dateTime(a.t)) },
@@ -42,18 +42,16 @@ export default {
       { key: "lvl", label: "Level", get: (a) => a.level, html: (a) => lvl(a.level) },
       { key: "inc", label: "Incident", get: (a) => a.inc, html: (a) => `<a class="mono small" href="#/incidents/${esc(a.inc)}">${esc(a.inc)}</a>` },
       { key: "ap", label: "Gateway", get: (a) => a.applied || 0, html: (a) => a.applied ? badge(a.applied_ok === false ? "error" : `applied +${num(a.applied - a.t, 1)} s`, a.applied_ok === false ? "crit" : "ok") : badge(a.live ? "not confirmed" : "simulated", a.live ? "mute" : "info") },
-      { key: "src", label: "Type", sort: false, html: () => badge("automatic", "mute") },
     ], { pageSize: 12, sortKey: "t" });
 
     function draw(s) {
       if (!s) return;
       const t = D.now(s), m = D.mode(s), hs = D.devices(s), incs = s.incidents || [], ttl = s.system?.response?.ttl_s ?? policy?.ladder?.ttl_s ?? 60;
       const pepSets = (s.system?.pep && s.system.pep.sets) || {}, setFor = { 1: "watch", 2: "rate", 3: "quar", 4: "iso" };
-      $("[data-mode]").innerHTML = m === "live" ? banner("info", `<b>Live enforcement.</b> The gateway (PEP) applies these levels with nftables set timeouts; state ${esc(s.system?.pep?.mode || "unknown")}, controller update ${num(s.system?.pep?.controller_age_s, 1)} s ago.`, "shield")
-        : banner("info", "<b>Replay mode:</b> the response engine decides levels exactly as in live mode, but the gateway commands are only rendered, not executed.", "info");
+      $("[data-mode]").innerHTML = m === "live" ? "" : banner("info", "Replay mode: gateway actions are simulated.", "info");
       const counts = D.LEVELS.map((L) => hs.filter((h) => (h.level || 0) === L.n).length);
-      $("[data-ladder]").innerHTML = D.LEVELS.map((L) => `<button class="rung ${focus === L.n ? "on" : ""}" data-l="${L.n}" style="--rc:${L.color}"><div class="rl">L${L.n}</div><h3>${L.name.toUpperCase()}</h3><p>${esc(L.text)}</p>
-        <div class="row between"><span class="rc-count">${counts[L.n]}</span><span class="tiny muted">device${counts[L.n] === 1 ? "" : "s"} now</span></div></button>`).join("");
+      $("[data-ladder]").innerHTML = D.LEVELS.map((L) => `<button class="rung ${focus === L.n ? "on" : ""}" data-l="${L.n}" style="--rc:${L.color}"><div class="rl">L${L.n}</div><h3>${L.name.toUpperCase()}</h3><p style="min-height:0">${esc(["Normal traffic", "Logged and watched", "DICOM rate-limited", "Uploads quarantined", "Fully blocked"][L.n])}</p>
+        <div class="row between"><span class="rc-count">${counts[L.n]}</span><span class="tiny muted">device${counts[L.n] === 1 ? "" : "s"}</span></div></button>`).join("");
       // caps
       if (policy) {
         const roles = policy.criticality.role_to_criticality, maxL = policy.criticality.max_level;
@@ -62,9 +60,9 @@ export default {
           + `<p class="note mt12">${icon("info")}<span>The PACS never goes above L2 and imaging modalities never above L3 automatically, so a detection can slow imaging down but never cut the archive off. Caps are enforced in the backend response engine; this console cannot override them.</span></p>`;
         const L = policy.ladder;
         $("[data-policy]").innerHTML = `<dl class="kv"><dt>Base rule</dt><dd class="mono small">${esc(L.base).split(" | ").join("<br>")}</dd>
-          <dt>Escalation</dt><dd>one level up if the alarm persists ${esc(L.escalate_after_s)} s</dd><dt>Action lifetime</dt><dd>${esc(L.ttl_s)} s, renewed by each alarm; then one level down</dd>
-          <dt>Fail-open</dt><dd>${L.fail_open ? "yes: if VitalGate stops, every gateway entry expires on its own" : "no"}</dd><dt>Detector</dt><dd>CUSUM k ${esc(policy.detector.kref)}, h ${esc(policy.detector.h)}</dd></dl>
-          <div class="tiny muted mt12 mb8" style="font-weight:650">SEVERITY BY CLASS (1 low · 2 medium · 3 high)</div><div class="chips">${Object.entries(L.severity).map(([c, v]) => `<span class="badge ${["", "warn", "orange", "crit"][v]}">${esc(D.clsShort(c))} · ${v}</span>`).join("")}</div>`;
+          <dt>Escalation</dt><dd>after ${esc(L.escalate_after_s)} s of alarms</dd><dt>Action lifetime</dt><dd>${esc(L.ttl_s)} s</dd>
+          <dt>Fail-open</dt><dd>${L.fail_open ? "yes" : "no"}</dd><dt>Detector</dt><dd>CUSUM k ${esc(policy.detector.kref)}, h ${esc(policy.detector.h)}</dd></dl>
+          <div class="tiny muted mt12 mb8" style="font-weight:650">SEVERITY BY CLASS</div><div class="chips">${Object.entries(L.severity).map(([c, v]) => `<span class="badge ${["", "warn", "orange", "crit"][v]}">${esc(D.clsShort(c))} · ${v}</span>`).join("")}</div>`;
       } else { $("[data-caps]").innerHTML = `<div class="skel" style="height:150px"></div>`; $("[data-policy]").innerHTML = `<div class="skel" style="height:150px"></div>`; }
       // current
       const holds = new Set(s.holds || []);
@@ -80,11 +78,12 @@ export default {
         .filter((a) => lvF === "" || a.level === Number(lvF)));
       // controls
       const untri = incs.filter((i) => i.status === "active" && D.triage(s, i).key === "new");
-      $("[data-ctl]").innerHTML = `<div class="col" style="gap:12px">
-        <div class="row top" style="gap:10px"><span class="badge ok">${icon("check")}Available</span><div class="small"><b>Confirm attack</b> on an incident: the gateway keeps that device's quarantined DICOM uploads on hold (never auto-released). <b>False alarm</b> records the verdict for retraining.</div></div>
-        <div class="row top" style="gap:10px"><span class="badge mute">${icon("ban")}Not offered</span><div class="small"><b>Manual escalate / release of a level.</b> The VitalGate backend has no manual override by design: levels come only from the response engine, so no click can push a scanner past its cap or block the PACS. Actions end by themselves after ${esc(ttl)} s without new alarms.</div></div>
-        ${holds.size ? `<div class="banner warn" style="margin:0">${icon("lock")}<div><b>On hold:</b> ${[...holds].map((ip) => esc(D.shortName(D.hostByIp(s, ip) || { name: ip }))).join(", ")}</div></div>` : ""}
-        <div><div class="tiny muted mb8" style="font-weight:650">ACTIVE INCIDENTS WAITING FOR A VERDICT</div>${untri.length ? untri.map((i) => `<a class="li click" style="padding:8px 0;border-bottom:1px solid var(--border)" href="#/incidents/${esc(i.id)}"><div class="lic crit">${icon("siren")}</div><div class="grow"><div class="small" style="font-weight:600">${esc(i.id)} · ${esc(D.clsShort(i.cls))}</div><div class="tiny muted">${esc(D.shortName(i))} · ${lvl(i.level)}</div></div>${icon("chevRight")}</a>`).join("") : `<div class="small muted">None. All active incidents are triaged.</div>`}</div></div>`;
+      $("[data-ctl]").innerHTML = `<div class="col" style="gap:10px">
+        <div class="row" style="gap:8px">${badge("Confirm attack", "crit", "check")}<span class="small muted">holds the device's quarantined uploads</span></div>
+        <div class="row" style="gap:8px">${badge("False alarm", "ok", "check")}<span class="small muted">records the verdict</span></div>
+        <div class="row" style="gap:8px">${badge("Manual level change", "mute", "ban")}<span class="small muted">not available (safety caps)</span></div>
+        ${holds.size ? `<div class="banner warn" style="margin:0">${icon("lock")}<div>On hold: ${[...holds].map((ip) => esc(D.shortName(D.hostByIp(s, ip) || { name: ip }))).join(", ")}</div></div>` : ""}
+        <div class="tiny muted" style="font-weight:650;margin-top:6px">WAITING FOR A VERDICT</div>${untri.length ? untri.map((i) => `<a class="li click" style="padding:8px 0;border-bottom:1px solid var(--border)" href="#/incidents/${esc(i.id)}"><div class="lic crit">${icon("siren")}</div><div class="grow"><div class="small" style="font-weight:600">${esc(i.id)}</div><div class="tiny muted">${esc(D.shortName(i))}</div></div>${lvl(i.level, false)}</a>`).join("") : `<div class="small muted">None</div>`}</div>`;
     }
     return { update: draw };
   },

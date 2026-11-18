@@ -24,9 +24,9 @@ function list(el, ctx) {
       <select class="input" data-conn aria-label="Connection"><option value="all">Any connection</option>${Object.entries(D.CONN).map(([k, v]) => `<option value="${k}">${v.label}</option>`).join("")}</select>
       <select class="input" data-sort aria-label="Sort by"><option value="level">Sort: threat level</option><option value="score">Sort: threat score</option><option value="name">Sort: name</option><option value="ip">Sort: IP address</option><option value="last">Sort: last communication</option><option value="alarms">Sort: alarms</option></select>
       <span class="small muted" data-n style="margin-left:auto"></span></div>
-      <div class="row wrap" style="padding:0 16px 12px;gap:14px" data-legend>${Object.entries(D.STATUS).map(([k, v]) => `<span class="row small"><i class="dot" style="background:${v.color}"></i>${v.label}</span>`).join("")}</div></div>
+</div>
     <div data-list></div>
-    <h2 class="mt16 mb12" style="margin-top:22px">Imaging infrastructure</h2><div class="dev-grid" data-infra></div>`;
+    <h2 class="mb12" style="margin-top:22px;font-size:15px">Infrastructure</h2><div class="dev-grid" data-infra></div>`;
   const $ = (s) => el.querySelector(s);
   const table = new Table(document.createElement("div"), [
     { key: "name", label: "Device", get: (h) => h.name, html: (h) => `<div class="row"><div style="width:54px;height:36px">${deviceArt(D.deviceKind(h).kind)}</div><div><b class="small">${esc(D.shortName(h))}</b><div class="tiny faint">${esc(D.deviceKind(h).label)}</div></div></div>` },
@@ -140,15 +140,15 @@ function profile(el, ip, ctx) {
       </dl>`;
     const ser = h.series || [], recent = ser.filter((r) => r[0] > t - 60);
     $("[data-k]").innerHTML = [
-      ["Threat score (last window)", num(h.last_score, 3), "gauge", h.last_score >= .5 ? "crit" : "ok", "calibrated attack probability"],
-      ["Windows scored", num(h.windows), "radio", "", `${num(h.alarms)} alarm windows`],
+      ["Threat score", num(h.last_score, 3), "gauge", h.last_score >= .5 ? "crit" : "ok", ""],
+      ["Windows scored", num(h.windows), "radio", "", ""],
       ["Incidents", num(h.incidents), "siren", h.incidents ? "orange" : "", open ? "1 active now" : "none active"],
-      ["Traffic (60 s)", bytes(recent.reduce((a, r) => a + r[1] + r[2], 0)), "activity", "", `${bytes(recent.reduce((a, r) => a + r[1], 0))} to PACS · ${bytes(recent.reduce((a, r) => a + r[2], 0))} from PACS`],
+      ["Traffic (60 s)", bytes(recent.reduce((a, r) => a + r[1] + r[2], 0)), "activity", "", ""],
     ].map(([l, v, ic, tone, f]) => `<div class="card kpi tone-${tone}"><div class="kic">${icon(ic)}</div><div><div class="klabel">${l}</div><div class="kval">${esc(v)}</div><div class="kfoot">${esc(f)}</div></div></div>`).join("");
     const body = $("[data-tabbody]");
     if (tab === "activity") {
-      if (!body.querySelector("[data-c1]")) body.innerHTML = `<div class="card-b"><div class="grid g2"><div><h3 class="mb8">DICOM traffic with the PACS</h3><div data-c1></div><div class="legend mt8"><span><i style="background:var(--blue)"></i>Device → PACS</span><span><i style="background:var(--c2)"></i>PACS → device</span></div></div>
-        <div><h3 class="mb8">Threat score and response level</h3><div data-c2></div><div class="legend mt8"><span><i class="line" style="background:var(--crit)"></i>Score</span><span><i class="line" style="background:var(--orange)"></i>Level (right axis)</span><span><i class="line" style="background:var(--text-3)"></i>Alarm threshold 0.5</span></div></div></div>
+      if (!body.querySelector("[data-c1]")) body.innerHTML = `<div class="card-b"><div class="grid g2"><div><h3 class="mb8">DICOM traffic with the PACS</h3><div data-c1></div><div class="legend mt8"><span><i style="background:var(--blue)"></i>To PACS</span><span><i style="background:var(--c2)"></i>From PACS</span></div></div>
+        <div><h3 class="mb8">Threat score and response level</h3><div data-c2></div><div class="legend mt8"><span><i class="line" style="background:var(--crit)"></i>Score</span><span><i class="line" style="background:var(--orange)"></i>Level</span></div></div></div>
         <p class="note mt12">${icon("info")}<span>The sensor keeps the last ${ser.length} two-second windows of this device (about ${dur(ser.length ? ser[ser.length - 1][0] - ser[0][0] : 0)} of activity). Incident windows are kept for the whole run under Alerts.</span></p></div>`;
       const t0 = ser.length ? ser[0][0] : t - 300;
       timeChart(body.querySelector("[data-c1]"), [

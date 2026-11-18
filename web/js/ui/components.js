@@ -4,6 +4,7 @@ import { esc } from "../core/fmt.js";
 import { LEVELS, STATUS, CONN, secStatus } from "../core/derive.js";
 
 export function card({ title, icon: ic, sub = "", actions = "", body = "", id = "", cls = "", bodyCls = "" }) {
+  if (sub && sub.replace(/<[^>]+>/g, "").length > 42) sub = "";   // long subtitles removed: keep cards uncluttered
   return `<section class="card ${cls}" ${id ? `id="${id}"` : ""}>${title ? `<div class="card-h"><div><h2>${ic ? icon(ic) : ""}${esc(title)}</h2>${sub ? `<div class="sub">${sub}</div>` : ""}</div>${actions ? `<div class="row wrap">${actions}</div>` : ""}</div>` : ""}<div class="card-b ${bodyCls}">${body}</div></section>`;
 }
 /** KPI tile. value null -> "waiting for data" state. */
@@ -20,7 +21,7 @@ export function connBadge(st) { const c = CONN[st] || CONN["not seen"]; return `
 export function empty(title, sub = "", ic = "info") { return `<div class="empty"><div class="eic">${icon(ic)}</div><b>${esc(title)}</b>${sub ? `<div class="small">${sub}</div>` : ""}</div>`; }
 export const research = (txt = "Research result · measured offline") => `<span class="tag-research">${icon("file")}${esc(txt)}</span>`;
 export function banner(kind, html, ic) { return `<div class="banner ${kind}">${icon(ic || (kind === "info" ? "info" : "alert"))}<div>${html}</div></div>`; }
-export function pageHead(title, sub, actions = "") { return `<div class="page-head"><div><h1>${esc(title)}</h1>${sub ? `<p>${sub}</p>` : ""}</div>${actions ? `<div class="row wrap no-print">${actions}</div>` : ""}</div>`; }
+export function pageHead(title, sub, actions = "") { return actions ? `<div class="page-head" style="justify-content:flex-end;margin-bottom:14px"><div class="row wrap no-print">${actions}</div></div>` : ""; }
 export function seg(name, options, value) { return `<div class="seg" data-seg="${name}" role="tablist">${options.map(([v, l, dis]) => `<button data-v="${v}" class="${v === value ? "on" : ""}" ${dis ? "disabled" : ""}>${esc(l)}</button>`).join("")}</div>`; }
 export function bindSeg(root, name, fn) {
   root.querySelector(`[data-seg="${name}"]`)?.addEventListener("click", (e) => {
@@ -30,5 +31,5 @@ export function bindSeg(root, name, fn) {
 }
 /** Mode notice for data that only exists in live mode. */
 export function liveOnly(m, what) {
-  return m === "live" ? "" : banner("info", `<b>${esc(what)} comes from the live gateway.</b> You are in ${m === "replay" ? "replay mode (recorded traffic, gateway commands are simulated and not executed)" : "no-data mode"}. Start live mode (<code>start.cmd live</code>) with the Docker test bed to see real enforcement.`, "info");
+  return m === "live" ? "" : banner("info", `${esc(what)} is available in live mode (<code>start-live.cmd</code>).`, "info");
 }
